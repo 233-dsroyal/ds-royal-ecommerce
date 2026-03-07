@@ -1,0 +1,6 @@
+[build]
+  # On publie tout le dossier principal (Frontend)
+  publish = "/"
+  
+  # Le backend sera déployé séparément, donc on ignore son build ici
+  ignore = "backend/**"
