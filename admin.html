@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DS ROYAL | Tableau de Bord Administrateur</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-main {
+            padding: 10rem 5% 5rem;
+            min-height: 100vh;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(212, 175, 55, 0.05) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-color);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-value {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .orders-table-container {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            overflow-x: auto;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .orders-table th {
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .orders-table td {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            background: rgba(46, 204, 113, 0.1);
+            color: #2ecc71;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">DS ROYAL | <span style="font-size: 1rem; color: var(--text-secondary);">Directoire</span></div>
+        <nav class="nav-links">
+            <a href="index.html">← Retour à la Boutique</a>
+        </nav>
+        <div class="nav-actions">
+             <button class="btn btn-primary" onclick="refreshAdmin()">Actualiser les données</button>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <div class="section-header" style="margin-bottom: 3rem;">
+            <h2>Centre de Commandement <span class="gradient-text">IA</span></h2>
+            <p>Vue d'ensemble en temps réel des performances de votre entreprise.</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📈</div>
+                <div class="stat-value" id="statsRevenue">0.00 €</div>
+                <div class="stat-label">Chiffre d'Affaires</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📦</div>
+                <div class="stat-value" id="statsOrders">0</div>
+                <div class="stat-label">Commandes Totales</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💎</div>
+                <div class="stat-value" id="statsProducts">0</div>
+                <div class="stat-label">Produits en Catalogue</div>
+                <button class="btn btn-secondary" id="sourcingBtn" style="margin-top: 1rem; width: 100%; border: 1px solid var(--accent-color); color: var(--accent-color);" onclick="runSourcingBot()">Activer le Robot Importateur</button>
+            </div>
+        </div>
+
+        <div class="orders-table-container">
+            <h3 style="font-size: 1.8rem; margin-bottom: 1.5rem;">Dernières Transactions</h3>
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>N° Commande</th>
+                        <th>Date et Heure</th>
+                        <th>Articles Achetés</th>
+                        <th>Montant Total</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                    <!-- Rempli par le JS -->
+                    <tr>
+                        <td colspan="5" style="text-align:center; color: var(--text-secondary);">Connexion au Cerveau DS ROYAL en cours...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="admin.js"></script>
+</body>
+</html>

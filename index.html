@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DS ROYAL | Boutique e-commerce d'exception</title>
+    <meta name="description" content="Découvrez une technologie de première classe. DS ROYAL offre des gadgets haut de gamme et innovants pour la maison.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">DS ROYAL</div>
+        <nav class="nav-links">
+            <a href="#home">Accueil</a>
+            <a href="#collections">Collections</a>
+            <a href="#about">À Propos</a>
+            <a href="#contact">Contact</a>
+        </nav>
+        <div class="nav-actions">
+             <button class="cart-btn" onclick="toggleCart()">Panier (0)</button>
+        </div>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">L'Élégance de la <span class="gradient-text">Technologie</span></h1>
+                <p class="hero-subtitle">Des gadgets innovants et pratiques, sélectionnés avec soin pour métamorphoser votre quotidien. C'est l'essence même de DS ROYAL.</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" onclick="document.getElementById('collections').scrollIntoView({behavior: 'smooth'})">Découvrir la Collection</button>
+                    <button class="btn btn-secondary">Voir les Nouveautés</button>
+                </div>
+            </div>
+            
+            <div class="hero-visual">
+                <div class="glow-orb"></div>
+                <img src="https://images.unsplash.com/photo-1543512214-318c7553f230?q=80&w=600&auto=format&fit=crop" alt="Produit Phare DS ROYAL" class="hero-image" id="hero-img">
+            </div>
+        </section>
+
+        <section id="collections" class="featured-products">
+            <div class="section-header">
+                <h2>Nos <span class="gradient-text">Meilleures Ventes</span></h2>
+                <p>Découvrez notre sélection exclusive.</p>
+            </div>
+            <div class="product-grid" id="productGrid">
+                <!-- Les produits seront générés par JavaScript -->
+            </div>
+        </section>
+        
+        <section class="bot-features">
+             <div class="section-header">
+                <h2>Géré par <span class="gradient-text">Intelligence Artificielle</span></h2>
+                <p>Votre expérience e-commerce propulsée vers le futur par notre système 100% automatisé.</p>
+            </div>
+            <div class="feature-cards">
+                <div class="card">
+                    <div class="card-icon">⚡</div>
+                    <h3>Livraison Optimisée</h3>
+                    <p>Nos algorithmes d'expédition analysent les routes et optimisent chaque trajet de vos commandes.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🤖</div>
+                    <h3>Service Client 24/7</h3>
+                    <p>Un assistant IA dédié pour répondre à vos moindres requêtes instantanément, 24 heures sur 24.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">💎</div>
+                    <h3>Sélection Prémium</h3>
+                    <p>Notre IA analyse les tendances mondiales pour vous offrir les meilleurs gadgets High-Tech.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="about-section" style="background: var(--bg-primary);">
+            <div class="section-header">
+                <h2>L'Empire <span class="gradient-text">DS ROYAL</span></h2>
+                <p>Né de l'ambition de redéfinir le e-commerce mondial.</p>
+            </div>
+            <div style="max-width: 800px; margin: 0 auto; text-align: center; color: var(--text-secondary); line-height: 1.8; font-size: 1.15rem;">
+                <p style="margin-bottom: 20px;">Fondée sur le principe que la technologie doit être à la fois magnifique et invisible, <strong>DS ROYAL</strong> n'est pas qu'une simple boutique. C'est une entreprise pilotée par une Intelligence Artificielle avancée qui opère en tant que Directeur Technique pour vous garantir l'excellence absolue.</p>
+                <p>Nous pensons que le luxe technologique doit être accessible. C'est pourquoi nos algorithmes de sourcing scannent le monde entier pour trouver les pièces les plus exclusives avant tout le monde.</p>
+            </div>
+        </section>
+
+        <section id="contact" style="background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%); text-align: center;">
+            <div class="section-header">
+                <h2>Entrez en <span class="gradient-text">Contact</span></h2>
+                <p>Notre équipe et notre IA sont à votre écoute.</p>
+            </div>
+            <div style="margin-top: 2rem;">
+                <a href="mailto:contact@dsroyal.com" class="btn btn-primary">Envoyer un Email Spécial</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h2>DS ROYAL</h2>
+                <p>Votre partenaire e-commerce high-tech depuis la création.</p>
+            </div>
+            <div class="footer-links">
+                <h3>Liens Utiles</h3>
+                <ul>
+                    <li><a href="admin.html" style="color: var(--accent-color);">🔒 Accès Directoire (Admin)</a></li>
+                    <li><a href="#">Politique de Retour</a></li>
+                    <li><a href="#">FAQ (Questions Fréquentes)</a></li>
+                    <li><a href="#">Conditions Générales de Vente</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 DS ROYAL. Tous droits réservés. Construit par votre Directeur Technique IA.</p>
+        </div>
+    </footer>
+
+    <!-- Modal Panier -->
+    <div class="cart-modal-overlay" id="cartModal">
+        <div class="cart-modal">
+            <div class="cart-header">
+                <h2>Votre Panier</h2>
+                <button class="close-btn" onclick="toggleCart()">×</button>
+            </div>
+            <div class="cart-items" id="cartItems">
+                <!-- Items injectés via JS -->
+                <p style="text-align:center; color: var(--text-secondary); margin-top:20px;">Votre panier est vide.</p>
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span id="cartTotalPrice">0.00 €</span>
+                </div>
+                <button class="btn btn-primary" style="width:100%" onclick="checkout()">Passer à la caisse</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chatbot IA DS ROYAL -->
+    <div class="chatbot-container closed" id="chatbot">
+        <div class="chat-header" onclick="toggleChat()">
+            <span style="display:flex; align-items:center; gap:8px;">💬 Assistant DS ROYAL</span>
+            <span id="chat-toggle-icon">▲</span>
+        </div>
+        <div class="chat-body" id="chat-body">
+            <div class="message bot-message" style="margin-top: auto;">Bonjour, je suis l'IA personnelle de la boutique. Quel produit ou renseignement cherchez-vous aujourd'hui ?</div>
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="chat-input" placeholder="Posez votre question..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">Envoyer</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
