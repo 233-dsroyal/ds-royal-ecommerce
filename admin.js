@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:8000/api/admin';
+const BASE_URL = 'https://ds-royal-api.onrender.com/api/admin';
 
 async function fetchStats() {
     try {

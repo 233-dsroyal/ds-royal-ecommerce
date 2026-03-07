@@ -4,7 +4,7 @@ let allProducts = [];
 // Fonction qui contacte l'API (Le cerveau) pour obtenir les vrais produits de la base de données
 async function fetchAndRenderProducts() {
     try {
-        const response = await fetch('http://localhost:8000/api/products');
+        const response = await fetch('https://ds-royal-api.onrender.com/api/products');
         
         if (!response.ok) {
             throw new Error('Erreur de connexion au coffre-fort DS ROYAL');
@@ -98,7 +98,7 @@ window.checkout = async function() {
     }));
 
     try {
-        const response = await fetch('http://localhost:8000/api/checkout', {
+        const response = await fetch('https://ds-royal-api.onrender.com/api/checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ items: itemsPayload })
@@ -187,7 +187,7 @@ async function sendMessage() {
     // L'ajout d'une fonction de simulation de réflexion
     setTimeout(async () => {
         try {
-            const response = await fetch('http://localhost:8000/api/chat', {
+            const response = await fetch('https://ds-royal-api.onrender.com/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: text })
