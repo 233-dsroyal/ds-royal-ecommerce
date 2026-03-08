@@ -90,9 +90,62 @@
             border: 1px solid rgba(46, 204, 113, 0.3);
         }
 
+        .login-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .login-box {
+            background: var(--surface-color);
+            padding: 3rem;
+            border-radius: 20px;
+            border: 1px solid var(--accent-color);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.1);
+        }
+
+        .login-box h2 {
+            margin-bottom: 2rem;
+            color: var(--accent-color);
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .login-box button {
+            width: 100%;
+        }
+
     </style>
 </head>
 <body>
+    <!-- Overlay de Connexion Sécurisée -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-box">
+            <h2>Accès Directoire Sécurisé</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">Veuillez entrer le mot de passe de l'Empereur pour accéder à vos données confidentielles.</p>
+            <input type="password" id="adminPassword" placeholder="Mot de passe..." onkeypress="if(event.key === 'Enter') loginAdmin()">
+            <button class="btn btn-primary" onclick="loginAdmin()">Déverrouiller</button>
+            <p id="loginError" style="color: #ff6b6b; margin-top: 1rem; display: none;">Mot de passe incorrect ou Token expiré.</p>
+        </div>
+    </div>
+
     <header class="navbar">
         <div class="logo">DS ROYAL | <span style="font-size: 1rem; color: var(--text-secondary);">Directoire</span></div>
         <nav class="nav-links">
@@ -100,6 +153,7 @@
         </nav>
         <div class="nav-actions">
              <button class="btn btn-primary" onclick="refreshAdmin()">Actualiser les données</button>
+             <button class="btn btn-secondary" onclick="logoutAdmin()" style="margin-left: 1rem; border-color: #ff6b6b; color: #ff6b6b;">Déconnexion</button>
         </div>
     </header>
 

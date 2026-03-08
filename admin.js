@@ -1,8 +1,27 @@
-const BASE_URL = 'https://ds-royal-api.onrender.com/api/admin';
+const BASE_URL = 'http://127.0.0.1:8000/api/admin'; // TODO: Change back to Render for production
+
+function getAuthHeaders() {
+    const token = localStorage.getItem('adminToken');
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    };
+}
+
+function checkAuth(response) {
+    if (response.status === 401) {
+        document.getElementById('loginOverlay').style.display = 'flex';
+        document.getElementById('loginError').style.display = 'block';
+        document.getElementById('loginError').textContent = 'Session expirée. Reconnexion requise.';
+        localStorage.removeItem('adminToken');
+        throw new Error('Non autorisé');
+    }
+}
 
 async function fetchStats() {
     try {
-        const response = await fetch(`${BASE_URL}/stats`);
+        const response = await fetch(`${BASE_URL}/stats`, { headers: getAuthHeaders() });
+        checkAuth(response);
         const stats = await response.json();
         
         document.getElementById('statsRevenue').textContent = stats.revenue;
@@ -15,7 +34,8 @@ async function fetchStats() {
 
 async function fetchOrders() {
     try {
-        const response = await fetch(`${BASE_URL}/orders`);
+        const response = await fetch(`${BASE_URL}/orders`, { headers: getAuthHeaders() });
+        checkAuth(response);
         const orders = await response.json();
         
         const tbody = document.getElementById('ordersTableBody');
@@ -79,8 +99,10 @@ window.runSourcingBot = async function() {
     
     try {
         const response = await fetch(`${BASE_URL}/sourcing`, {
-            method: 'POST'
+            method: 'POST',
+            headers: getAuthHeaders()
         });
+        checkAuth(response);
         const data = await response.json();
         
         if (response.ok) {
@@ -98,9 +120,54 @@ window.runSourcingBot = async function() {
     }
 }
 
+// --- SYSTÈME D'AUTHENTIFICATION ---
+window.loginAdmin = async function() {
+    const password = document.getElementById('adminPassword').value;
+    const errorEl = document.getElementById('loginError');
+    
+    try {
+        const response = await fetch(`${BASE_URL}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('adminToken', data.token);
+            document.getElementById('loginOverlay').style.display = 'none';
+            errorEl.style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+            refreshAdmin();
+        } else {
+            errorEl.style.display = 'block';
+            errorEl.textContent = 'Mot de passe incorrect.';
+        }
+    } catch (err) {
+        errorEl.style.display = 'block';
+        errorEl.textContent = 'Erreur de connexion au Cerveau IA.';
+    }
+}
+
+window.logoutAdmin = function() {
+    localStorage.removeItem('adminToken');
+    document.getElementById('loginOverlay').style.display = 'flex';
+}
+
 // Initialisation au chargement
 document.addEventListener('DOMContentLoaded', () => {
-    refreshAdmin();
+    // Vérifier si un token existe
+    if (!localStorage.getItem('adminToken')) {
+        document.getElementById('loginOverlay').style.display = 'flex';
+    } else {
+        document.getElementById('loginOverlay').style.display = 'none';
+        refreshAdmin();
+    }
+    
     // Rafraichissement toutes les 30s
-    setInterval(refreshAdmin, 30000);
+    setInterval(() => {
+        if (localStorage.getItem('adminToken')) {
+            refreshAdmin();
+        }
+    }, 30000);
 });

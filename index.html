@@ -17,7 +17,8 @@
             <a href="#about">À Propos</a>
             <a href="#contact">Contact</a>
         </nav>
-        <div class="nav-actions">
+        <div class="nav-actions" style="display: flex; gap: 1rem; align-items: center;">
+             <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeToggle" style="background: transparent; border: none; font-size: 1.5rem; cursor: pointer;">☀️</button>
              <button class="cart-btn" onclick="toggleCart()">Panier (0)</button>
         </div>
     </header>
@@ -44,6 +45,17 @@
                 <h2>Nos <span class="gradient-text">Meilleures Ventes</span></h2>
                 <p>Découvrez notre sélection exclusive.</p>
             </div>
+
+            <div class="filters-container" style="display: flex; flex-direction: column; align-items: center; gap: 1.5rem; margin-bottom: 4rem;">
+                <input type="text" id="searchInput" placeholder="Rechercher une innovation..." onkeyup="filterProducts()" style="width: 100%; max-width: 500px; padding: 1rem 1.5rem; border-radius: 30px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-size: 1.1rem; outline: none;">
+                <div class="category-filters" style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                    <button class="filter-btn active btn-secondary" style="border-radius: 20px; padding: 0.5rem 1.5rem;" onclick="filterCategory('All', this)">Tout</button>
+                    <button class="filter-btn btn-secondary" style="border-radius: 20px; padding: 0.5rem 1.5rem; opacity: 0.7;" onclick="filterCategory('Nettoyage Auto', this)">Nettoyage</button>
+                    <button class="filter-btn btn-secondary" style="border-radius: 20px; padding: 0.5rem 1.5rem; opacity: 0.7;" onclick="filterCategory('Maison Zen', this)">Maison Zen</button>
+                    <button class="filter-btn btn-secondary" style="border-radius: 20px; padding: 0.5rem 1.5rem; opacity: 0.7;" onclick="filterCategory('Tech Premium', this)">Tech Premium</button>
+                </div>
+            </div>
+
             <div class="product-grid" id="productGrid">
                 <!-- Les produits seront générés par JavaScript -->
             </div>
@@ -115,6 +127,16 @@
             <p>&copy; 2026 DS ROYAL. Tous droits réservés. Construit par votre Directeur Technique IA.</p>
         </div>
     </footer>
+
+    <!-- Quick View Modal -->
+    <div class="cart-modal-overlay" id="quickViewModal" style="justify-content: center; align-items: center;">
+        <div class="quick-view-content" style="background: var(--bg-secondary); width: 90%; max-width: 900px; border-radius: 20px; padding: 2rem; position: relative; border: 1px solid var(--border-color); box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeUp 0.3s ease-out;">
+            <button class="close-btn" onclick="closeQuickView()" style="position: absolute; top: 1rem; right: 1.5rem; z-index: 10;">×</button>
+            <div class="quick-view-grid" id="quickViewBody" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <!-- Rempli par JS -->
+            </div>
+        </div>
+    </div>
 
     <!-- Modal Panier -->
     <div class="cart-modal-overlay" id="cartModal">

@@ -1,47 +1,152 @@
+// --- GESTION DU THEME (DARK / LIGHT MODE) ---
+let currentTheme = localStorage.getItem('theme') || 'dark';
+applyTheme();
+
+window.toggleTheme = function() {
+    currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('theme', currentTheme);
+    applyTheme();
+}
+
+function applyTheme() {
+    const root = document.documentElement;
+    const btn = document.getElementById('themeToggle');
+    if(currentTheme === 'light') {
+        root.style.setProperty('--bg-primary', '#f5f5f7');
+        root.style.setProperty('--bg-secondary', '#ffffff');
+        root.style.setProperty('--text-primary', '#1d1d1f');
+        root.style.setProperty('--text-secondary', '#86868b');
+        root.style.setProperty('--border-color', 'rgba(0, 0, 0, 0.1)');
+        btn.textContent = '🌙';
+    } else {
+        root.style.setProperty('--bg-primary', '#0a0a0f');
+        root.style.setProperty('--bg-secondary', '#13131a');
+        root.style.setProperty('--text-primary', '#ffffff');
+        root.style.setProperty('--text-secondary', '#a3a3b5');
+        root.style.setProperty('--border-color', 'rgba(255, 255, 255, 0.1)');
+        btn.textContent = '☀️';
+    }
+}
+
 const productGrid = document.getElementById('productGrid');
 let allProducts = [];
+let currentCategory = 'All';
 
-// Fonction qui contacte l'API (Le cerveau) pour obtenir les vrais produits de la base de données
+const BASE_URL = 'http://127.0.0.1:8000/api'; // API URL
+
+// Fonction qui contacte l'API (Le cerveau)
 async function fetchAndRenderProducts() {
     try {
-        const response = await fetch('https://ds-royal-api.onrender.com/api/products');
+        const response = await fetch(`${BASE_URL}/products`);
         
         if (!response.ok) {
-            throw new Error('Erreur de connexion au coffre-fort DS ROYAL');
+            throw new Error('Erreur de connexion');
         }
 
         const products = await response.json();
         allProducts = products;
+        renderProducts(allProducts);
         
-        products.forEach((prod, index) => {
-            // Délai d'animation pour un effet de cascade au chargement
-            const delay = index * 0.2;
-            
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            card.style.animation = `fadeUp 0.6s ease-out ${delay}s backwards`;
-            
-            card.innerHTML = `
-                <div class="product-img-container">
-                    <img src="${prod.image}" alt="${prod.title}" class="product-img">
-                </div>
-                <div class="product-info">
-                    <div>
-                        <span style="font-size: 0.85rem; color: var(--accent-color); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600;">${prod.tag}</span>
-                        <h3 class="product-title" style="margin-top: 0.5rem;">${prod.title}</h3>
-                    </div>
-                    <div class="product-price">${prod.price}</div>
-                </div>
-                <!-- Logique pour envoyer la commande prévue plus tard -->
-                <button class="btn" onclick="addToCart(${prod.id})">Ajouter au Panier</button>
-            `;
-            
-            productGrid.appendChild(card);
-        });
     } catch (error) {
-        console.error("Aucun produit n'a pu être chargé:", error);
-        productGrid.innerHTML = `<p style="text-align:center; color: var(--text-secondary); grid-column: 1 / -1;">Connexion en cours avec l'Intelligence Artificielle de DS ROYAL...</p>`;
+        console.error("Erreur:", error);
+        productGrid.innerHTML = `<p style="text-align:center; color: var(--text-secondary); grid-column: 1 / -1;">Connexion en cours avec l'Intelligence Artificielle...</p>`;
     }
+}
+
+function renderProducts(productsToRender) {
+    productGrid.innerHTML = '';
+    if(productsToRender.length === 0) {
+        productGrid.innerHTML = `<p style="text-align:center; color: var(--text-secondary); grid-column: 1 / -1;">Aucun produit trouvé pour cette recherche.</p>`;
+        return;
+    }
+
+    productsToRender.forEach((prod, index) => {
+        const delay = index * 0.1;
+        
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.style.animation = `fadeUp 0.6s ease-out ${delay}s backwards`;
+        
+        card.innerHTML = `
+            <div class="product-img-container" style="cursor: pointer;" onclick="showQuickView(${prod.id})">
+                <img src="${prod.image}" alt="${prod.title}" class="product-img">
+                <div class="quick-view-overlay" style="position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; opacity:0; transition:opacity 0.3s;">
+                    <span style="color:white; font-weight:bold; border:1px solid white; padding:10px 20px; border-radius:20px;">Vue Rapide</span>
+                </div>
+            </div>
+            <div class="product-info">
+                <div>
+                    <span style="font-size: 0.85rem; color: var(--accent-color); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600;">${prod.tag}</span>
+                    <h3 class="product-title" style="margin-top: 0.5rem; cursor: pointer;" onclick="showQuickView(${prod.id})">${prod.title}</h3>
+                </div>
+                <div class="product-price">${prod.price}</div>
+            </div>
+            <button class="btn" onclick="addToCart(${prod.id})">Ajouter au Panier</button>
+        `;
+        
+        // Add hover effect manually to the product card for the overlay
+        card.addEventListener('mouseenter', () => card.querySelector('.quick-view-overlay').style.opacity = '1');
+        card.addEventListener('mouseleave', () => card.querySelector('.quick-view-overlay').style.opacity = '0');
+        
+        productGrid.appendChild(card);
+    });
+}
+
+// System de filtre
+window.filterProducts = function() {
+    const term = document.getElementById('searchInput').value.toLowerCase();
+    
+    let filtered = allProducts;
+    
+    if (currentCategory !== 'All') {
+        filtered = filtered.filter(p => p.tag === currentCategory);
+    }
+    
+    if (term) {
+        filtered = filtered.filter(p => p.title.toLowerCase().includes(term));
+    }
+    
+    renderProducts(filtered);
+}
+
+window.filterCategory = function(cat, btn) {
+    currentCategory = cat;
+    document.querySelectorAll('.filter-btn').forEach(b => {
+        b.classList.remove('active');
+        b.style.opacity = '0.7';
+    });
+    btn.classList.add('active');
+    btn.style.opacity = '1';
+    
+    filterProducts();
+}
+
+// Vue Rapide (Quick View)
+window.showQuickView = function(id) {
+    const product = allProducts.find(p => p.id === id);
+    if (!product) return;
+    
+    const modal = document.getElementById('quickViewModal');
+    const body = document.getElementById('quickViewBody');
+    
+    body.innerHTML = `
+        <div style="border-radius: 15px; overflow: hidden; height: 100%; min-height: 300px; background: #fff;">
+            <img src="${product.image}" alt="${product.title}" style="width: 100%; height: 100%; object-fit: contain;">
+        </div>
+        <div style="display: flex; flex-direction: column; justify-content: center;">
+            <span style="color: var(--accent-color); font-weight: bold; letter-spacing: 2px;">${product.tag}</span>
+            <h2 style="font-size: 2.5rem; margin: 10px 0;">${product.title}</h2>
+            <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 20px;">Ce produit sélectionné par notre intelligence artificielle redéfinit les standards de l'innovation. Profitez de fonctionnalités exclusives conçues pour améliorer votre quotidien de manière durable.</p>
+            <div style="font-size: 2rem; font-weight: 800; color: var(--accent-color); margin-bottom: 30px;">${product.price}</div>
+            <button class="btn btn-primary" onclick="addToCart(${product.id}); closeQuickView();" style="font-size:1.2rem; padding: 15px;">Ajouter au Panier</button>
+        </div>
+    `;
+    
+    modal.style.display = 'flex';
+}
+
+window.closeQuickView = function() {
+    document.getElementById('quickViewModal').style.display = 'none';
 }
 
 // Fonction panier avec micro-animation fluide
@@ -98,7 +203,7 @@ window.checkout = async function() {
     }));
 
     try {
-        const response = await fetch('https://ds-royal-api.onrender.com/api/checkout', {
+        const response = await fetch(`${BASE_URL}/checkout`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ items: itemsPayload })
@@ -187,7 +292,7 @@ async function sendMessage() {
     // L'ajout d'une fonction de simulation de réflexion
     setTimeout(async () => {
         try {
-            const response = await fetch('https://ds-royal-api.onrender.com/api/chat', {
+            const response = await fetch(`${BASE_URL}/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: text })
