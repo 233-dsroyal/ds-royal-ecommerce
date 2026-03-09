@@ -138,6 +138,68 @@ window.runSourcingBot = async function() {
     }
 }
 
+window.runMarketingBot = async function() {
+    const btn = document.getElementById('marketingBtn');
+    const originalText = btn.textContent;
+    btn.textContent = '🎯 Analyse en cours...';
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+    
+    try {
+        const response = await fetch(`${BASE_URL}/marketing`, {
+            method: 'POST',
+            headers: getAuthHeaders()
+        });
+        checkAuth(response);
+        const data = await response.json();
+        
+        if (response.ok) {
+            alert(data.message);
+            refreshAdmin();
+        } else {
+            alert('Erreur: ' + data.detail);
+        }
+    } catch (err) {
+        console.error('Erreur Bot:', err);
+        alert('Erreur de connexion avec le Cerveau IA.');
+    } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+        btn.style.opacity = '1';
+    }
+}
+
+window.runInventoryBot = async function() {
+    const btn = document.getElementById('inventoryBtn');
+    const originalText = btn.textContent;
+    btn.textContent = '📦 Ajustement des stocks...';
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+    
+    try {
+        const response = await fetch(`${BASE_URL}/inventory`, {
+            method: 'POST',
+            headers: getAuthHeaders()
+        });
+        checkAuth(response);
+        const data = await response.json();
+        
+        if (response.ok) {
+            alert(data.message);
+            refreshAdmin();
+        } else {
+            alert('Erreur: ' + data.detail);
+        }
+    } catch (err) {
+        console.error('Erreur Bot:', err);
+        alert('Erreur de connexion avec le Cerveau IA.');
+    } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+        btn.style.opacity = '1';
+    }
+}
+
 // --- SYSTÈME D'AUTHENTIFICATION ---
 window.loginAdmin = async function() {
     const password = document.getElementById('adminPassword').value;

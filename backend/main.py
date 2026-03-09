@@ -58,6 +58,8 @@ class Product(BaseModel):
     price: str
     image: str
     tag: str
+    original_price: Optional[str] = None
+    flash_sale_end: Optional[str] = None
 
 class CheckoutItem(BaseModel):
     product_id: int
@@ -94,6 +96,11 @@ def init_db():
             tag TEXT NOT NULL
         )
     ''')
+    try:
+        cursor.execute("ALTER TABLE products ADD COLUMN original_price TEXT")
+        cursor.execute("ALTER TABLE products ADD COLUMN flash_sale_end TIMESTAMP")
+    except sqlite3.OperationalError:
+        pass
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS orders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -284,6 +291,26 @@ def run_sourcing_bot():
             raise HTTPException(status_code=500, detail="Fournisseurs inaccessibles.")
     except requests.exceptions.Timeout:
         raise HTTPException(status_code=500, detail="Timeout - Le réseau fournisseur est lent.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/admin/marketing", dependencies=[Depends(verify_token)])
+def run_marketing_bot():
+    try:
+        import subprocess, sys
+        bot_path = os.path.join(os.path.dirname(__file__), "agents", "marketing_bot.py")
+        subprocess.run([sys.executable, bot_path], check=True)
+        return {"status": "success", "message": "🎯 Agent Marketing : Ventes flash générées avec succès !"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/admin/inventory", dependencies=[Depends(verify_token)])
+def run_inventory_bot():
+    try:
+        import subprocess, sys
+        bot_path = os.path.join(os.path.dirname(__file__), "agents", "inventory_bot.py")
+        subprocess.run([sys.executable, bot_path], check=True)
+        return {"status": "success", "message": "📦 Agent Logistique : Mise à jour des stocks simulée (rareté créée) !"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

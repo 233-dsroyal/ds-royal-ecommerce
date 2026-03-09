@@ -103,8 +103,13 @@ function renderProducts(productsToRender) {
                     <span style="font-size: 0.8rem; color: var(--accent-color); text-transform: uppercase; letter-spacing: 2px; font-weight: 600;">${prod.tag}</span>
                     <h3 class="product-title" style="margin-top: 0.5rem; cursor: pointer;" onclick="showQuickView(${prod.id})">${prod.title}</h3>
                 </div>
-                <div class="product-price">${prod.price}</div>
+                <div class="product-price">
+                    ${prod.original_price ? `<span style="text-decoration: line-through; color: var(--text-secondary); font-size: 0.95rem; margin-right: 8px;">${prod.original_price}</span>` : ''}
+                    ${prod.price}
+                    ${prod.original_price ? `<span style="background: rgba(255,107,107,0.2); color: #ff6b6b; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; margin-left: 10px; vertical-align: middle;">FLASH</span>` : ''}
+                </div>
             </div>
+            ${prod.stock_count !== null && prod.stock_count < 5 ? `<div style="color: #ff6b6b; font-size: 0.85rem; font-weight: bold; margin-bottom: 15px; text-align: center; animation: pulseGlow 2s infinite;">🔥 Vite, plus que ${prod.stock_count} en stock !</div>` : ''}
             <button class="btn add-to-cart-btn" onclick="addToCart(${prod.id})">
                 <span class="btn-text">🛒 Ajouter au Panier</span>
             </button>
@@ -163,8 +168,14 @@ window.showQuickView = function(id) {
             <h2 style="font-size: 2.2rem; margin: 10px 0; line-height: 1.2;">${product.title}</h2>
             <p style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 20px;">Ce produit sélectionné par notre intelligence artificielle redéfinit les standards de l'innovation. Profitez de fonctionnalités exclusives conçues pour améliorer votre quotidien de manière durable.</p>
             <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px;">
-                <div style="font-size: 2.5rem; font-weight: 800; color: var(--accent-color);">${product.price}</div>
-                <span style="background: rgba(46,204,113,0.1); color: #2ecc71; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">En Stock</span>
+                <div style="font-size: 2.5rem; font-weight: 800; color: var(--accent-color);">
+                    ${product.original_price ? `<span style="text-decoration: line-through; color: var(--text-secondary); font-size: 1.5rem; margin-right: 15px;">${product.original_price}</span>` : ''}
+                    ${product.price}
+                </div>
+                ${product.stock_count !== null && product.stock_count < 5 ? 
+                    `<span style="background: rgba(255,107,107,0.1); color: #ff6b6b; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; animation: pulseGlow 2s infinite;">🔥 Plus que ${product.stock_count} dispo !</span>` : 
+                    `<span style="background: rgba(46,204,113,0.1); color: #2ecc71; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">En Stock</span>`
+                }
             </div>
             <div style="display: flex; gap: 10px;">
                 <button class="btn btn-primary" onclick="addToCart(${product.id}); closeQuickView();" style="font-size:1.1rem; padding: 15px; flex: 1;">🛒 Ajouter au Panier</button>
@@ -362,7 +373,53 @@ document.addEventListener('DOMContentLoaded', () => {
             el.style.transform = 'translateY(0)';
         }, 300 + (i * 200));
     });
+    // Lance les agents frontend
+    scheduleNextNotification();
 });
+
+// --- AGENT DE PREUVE SOCIALE (SOCIAL PROOF BOT) ---
+const firstNames = ["Lucas", "Emma", "Thomas", "Chloé", "Alexandre", "Camille", "Hugo", "Léa", "Maxime", "Sarah"];
+const cities = ["Paris", "Lyon", "Marseille", "Bordeaux", "Lille", "Toulouse", "Nice", "Nantes", "Strasbourg", "Rennes"];
+
+function triggerLiveSaleNotification() {
+    if (allProducts.length === 0) return;
+    
+    const randomProduct = allProducts[Math.floor(Math.random() * allProducts.length)];
+    const randomName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const randomCity = cities[Math.floor(Math.random() * cities.length)];
+    const timeAgo = Math.floor(Math.random() * 59) + 1;
+    
+    const container = document.getElementById('live-notifications');
+    if (!container) return;
+    
+    const toast = document.createElement('div');
+    toast.className = 'live-social-toast';
+    toast.innerHTML = `
+        <img src="${randomProduct.image}" style="width: 50px; height: 50px; border-radius: 8px; object-fit: cover;">
+        <div>
+            <div style="font-weight: bold; margin-bottom: 3px;">${randomName} de ${randomCity}</div>
+            <div style="color: var(--text-secondary); font-size: 0.85rem;">A acheté <strong>${randomProduct.title}</strong></div>
+            <div style="color: var(--accent-color); font-size: 0.75rem; margin-top: 5px;">Il y a ${timeAgo} min - <em>Vérifié par l'IA</em> ✅</div>
+        </div>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Supprime l'alerte après 5s
+    setTimeout(() => {
+        toast.style.animation = 'fadeOutDown 0.5s ease-out forwards';
+        setTimeout(() => toast.remove(), 500);
+    }, 5000);
+}
+
+// Lancer le bot de preuve sociale avec un délai aléatoire entre 10s et 25s
+function scheduleNextNotification() {
+    const delay = Math.floor(Math.random() * (25000 - 10000 + 1)) + 10000;
+    setTimeout(() => {
+        triggerLiveSaleNotification();
+        scheduleNextNotification();
+    }, delay);
+}
 
 // --- CHATBOT IA ---
 const chatbot = document.getElementById('chatbot');
