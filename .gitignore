@@ -1,4 +1,9 @@
-
-__pycache__/*
-backend/venv/*
-ds_royal.db
+__pycache__/
+backend/__pycache__/
+backend/venv/
+venv/
+*.pyc
+*.db
+.env
+.DS_Store
+node_modules/

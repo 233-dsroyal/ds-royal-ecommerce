@@ -1,4 +1,11 @@
-const BASE_URL = 'http://127.0.0.1:8000/api/admin'; // TODO: Change back to Render for production
+// ============================================================
+// DS ROYAL - ADMIN DASHBOARD v2.0
+// ============================================================
+
+// --- CONFIGURATION INTELLIGENTE (Auto-détection local/production) ---
+const BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://127.0.0.1:8000/api/admin'
+    : 'https://ds-royal-api.onrender.com/api/admin';
 
 function getAuthHeaders() {
     const token = localStorage.getItem('adminToken');
@@ -24,12 +31,23 @@ async function fetchStats() {
         checkAuth(response);
         const stats = await response.json();
         
-        document.getElementById('statsRevenue').textContent = stats.revenue;
-        document.getElementById('statsOrders').textContent = stats.orders;
-        document.getElementById('statsProducts').textContent = stats.products;
+        // Animation compteur
+        animateValue('statsRevenue', stats.revenue);
+        animateValue('statsOrders', stats.orders);
+        animateValue('statsProducts', stats.products);
     } catch (err) {
         console.error('Erreur stats:', err);
     }
+}
+
+function animateValue(elementId, finalValue) {
+    const el = document.getElementById(elementId);
+    el.style.transition = 'transform 0.3s';
+    el.style.transform = 'scale(1.1)';
+    setTimeout(() => {
+        el.textContent = finalValue;
+        el.style.transform = 'scale(1)';
+    }, 150);
 }
 
 async function fetchOrders() {
@@ -41,24 +59,22 @@ async function fetchOrders() {
         const tbody = document.getElementById('ordersTableBody');
         
         if (orders.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--text-secondary);">Aucune commande pour le moment. Votre IA travaille à l'acquisition.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--text-secondary);">Aucune commande pour le moment. L'empire se construit ! 🚀</td></tr>`;
             return;
         }
 
         let html = '';
-        orders.forEach(order => {
-            // Formater la date en Français propre
+        orders.forEach((order, index) => {
             const d = new Date(order.date);
             const dateStr = d.toLocaleDateString('fr-FR', {
                 year: 'numeric', month: 'short', day: 'numeric',
                 hour: '2-digit', minute: '2-digit'
             });
 
-            // Formater le texte des items (pour éviter qu'il soit trop long)
             const itemsCut = order.items.length > 50 ? order.items.substring(0, 50) + "..." : order.items;
 
             html += `
-                <tr>
+                <tr style="animation: fadeUp 0.4s ease-out ${index * 0.05}s backwards;">
                     <td style="font-weight: 600;">#DS-${1000 + order.id}</td>
                     <td>${dateStr}</td>
                     <td title="${order.items}">${itemsCut}</td>
@@ -79,14 +95,14 @@ async function fetchOrders() {
 
 window.refreshAdmin = async function() {
     const btn = document.querySelector('.nav-actions .btn');
-    btn.textContent = 'Actualisation...';
+    btn.textContent = '⏳ Actualisation...';
     btn.style.opacity = '0.5';
     
     await fetchStats();
     await fetchOrders();
     
     setTimeout(() => {
-        btn.textContent = 'Actualiser les données';
+        btn.textContent = '🔄 Actualiser les données';
         btn.style.opacity = '1';
     }, 500);
 }
@@ -96,6 +112,7 @@ window.runSourcingBot = async function() {
     const originalText = btn.textContent;
     btn.textContent = '🤖 Scan en cours...';
     btn.disabled = true;
+    btn.style.opacity = '0.5';
     
     try {
         const response = await fetch(`${BASE_URL}/sourcing`, {
@@ -107,7 +124,7 @@ window.runSourcingBot = async function() {
         
         if (response.ok) {
             alert(data.message);
-            refreshAdmin(); // Rafraichit les stats pour voir les nouveaux produits
+            refreshAdmin();
         } else {
             alert('Erreur: ' + data.detail);
         }
@@ -117,6 +134,7 @@ window.runSourcingBot = async function() {
     } finally {
         btn.textContent = originalText;
         btn.disabled = false;
+        btn.style.opacity = '1';
     }
 }
 
@@ -124,6 +142,10 @@ window.runSourcingBot = async function() {
 window.loginAdmin = async function() {
     const password = document.getElementById('adminPassword').value;
     const errorEl = document.getElementById('loginError');
+    const loginBtn = document.querySelector('.login-box .btn-primary');
+    
+    loginBtn.textContent = '⏳ Vérification...';
+    loginBtn.disabled = true;
     
     try {
         const response = await fetch(`${BASE_URL}/login`, {
@@ -141,11 +163,14 @@ window.loginAdmin = async function() {
             refreshAdmin();
         } else {
             errorEl.style.display = 'block';
-            errorEl.textContent = 'Mot de passe incorrect.';
+            errorEl.textContent = '❌ Mot de passe incorrect.';
         }
     } catch (err) {
         errorEl.style.display = 'block';
-        errorEl.textContent = 'Erreur de connexion au Cerveau IA.';
+        errorEl.textContent = '🔌 Erreur de connexion au Cerveau IA.';
+    } finally {
+        loginBtn.textContent = 'Déverrouiller';
+        loginBtn.disabled = false;
     }
 }
 
@@ -154,9 +179,8 @@ window.logoutAdmin = function() {
     document.getElementById('loginOverlay').style.display = 'flex';
 }
 
-// Initialisation au chargement
+// --- INITIALISATION ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Vérifier si un token existe
     if (!localStorage.getItem('adminToken')) {
         document.getElementById('loginOverlay').style.display = 'flex';
     } else {
@@ -164,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
         refreshAdmin();
     }
     
-    // Rafraichissement toutes les 30s
+    // Auto-refresh toutes les 30s
     setInterval(() => {
         if (localStorage.getItem('adminToken')) {
             refreshAdmin();
