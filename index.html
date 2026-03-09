@@ -41,8 +41,14 @@
             <a href="#contact" class="nav-link">Contact</a>
         </nav>
 
-        <div class="nav-actions">
-            <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle" aria-label="Toggle theme">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="live-visitors">
+                <span class="pulse-dot"></span>
+                <span id="liveVisitorsCount" style="font-weight:bold; transition: 0.3s;">0</span> en ligne
+            </div>
+            
+            <div class="nav-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle" aria-label="Toggle theme">
                 <span class="theme-icon">☀️</span>
             </button>
             <button class="cart-btn" onclick="toggleCart()" id="cartBtn">
@@ -421,6 +427,14 @@
                 <h2>🛒 Votre Panier</h2>
                 <button class="modal-close" onclick="toggleCart()">✕</button>
             </div>
+            
+            <div class="shipping-progress">
+                <div class="shipping-text" id="shipping-text">Calcule en cours...</div>
+                <div class="shipping-bar-bg">
+                    <div class="shipping-bar-fill" id="shipping-progress-bar"></div>
+                </div>
+            </div>
+
             <div class="cart-items" id="cartItems">
                 <div class="cart-empty">
                     <span class="cart-empty-icon">🛒</span>
@@ -428,6 +442,9 @@
                     <button class="btn btn-glass btn-sm" onclick="toggleCart(); document.getElementById('collections').scrollIntoView({behavior:'smooth'})">Découvrir nos produits</button>
                 </div>
             </div>
+            
+            <div id="cartUpsell" class="cart-upsell-container"></div>
+            
             <div class="cart-footer">
                 <div class="cart-total">
                     <span>Total</span>

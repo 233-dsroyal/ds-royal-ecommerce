@@ -268,6 +268,14 @@ window.removeFromCart = function(index) {
     renderCart();
 }
 
+function getUpsellProduct() {
+    if(cartItems.length === 0 || allProducts.length === 0) return null;
+    const inCartIds = cartItems.map(i => i.id);
+    const availableUpsells = allProducts.filter(p => !inCartIds.includes(p.id));
+    if(availableUpsells.length === 0) return null;
+    return availableUpsells[Math.floor(Math.random() * availableUpsells.length)];
+}
+
 window.checkout = async function() {
     if(cartItems.length === 0) {
         alert("Votre panier est vide.");
@@ -318,10 +326,16 @@ window.checkout = async function() {
 function renderCart() {
     const cartItemsContainer = document.getElementById('cartItems');
     const cartTotalEl = document.getElementById('cartTotalPrice');
+    const freeShippingProgress = document.getElementById('shipping-progress-bar');
+    const freeShippingText = document.getElementById('shipping-text');
+    const upsellContainer = document.getElementById('cartUpsell');
     
     if (cartItems.length === 0) {
         cartItemsContainer.innerHTML = '<p style="text-align:center; color: var(--text-secondary); margin-top:20px;">Votre panier est vide. 🛒</p>';
         cartTotalEl.textContent = '0.00 €';
+        freeShippingProgress.style.width = '0%';
+        freeShippingText.innerHTML = 'Découvrez nos produits pour remplir votre panier !';
+        upsellContainer.style.display = 'none';
         return;
     }
 
@@ -347,6 +361,39 @@ function renderCart() {
 
     cartItemsContainer.innerHTML = html;
     cartTotalEl.textContent = total.toFixed(2) + ' €';
+
+    // Logique Livraison Gratuite (Seuil 200€)
+    const shippingThreshold = 200;
+    const progressPercent = Math.min((total / shippingThreshold) * 100, 100);
+    freeShippingProgress.style.width = `${progressPercent}%`;
+    
+    if(total >= shippingThreshold) {
+        freeShippingText.innerHTML = '🎉 Félicitations ! Vous avez débloqué la <strong>Livraison Express Gratuite</strong>.';
+        freeShippingProgress.style.background = '#2ecc71';
+    } else {
+        const remaining = (shippingThreshold - total).toFixed(2);
+        freeShippingText.innerHTML = `🛒 Plus que <strong>${remaining} €</strong> pour la Livraison Gratuite !`;
+        freeShippingProgress.style.background = 'var(--gradient-1)';
+    }
+
+    // Agent Upsell
+    const upsell = getUpsellProduct();
+    if(upsell) {
+        upsellContainer.style.display = 'block';
+        upsellContainer.innerHTML = `
+            <div style="font-size: 0.85rem; color: #a3a3b5; margin-bottom: 5px;">💡 L'IA vous recommande :</div>
+            <div style="display: flex; gap: 10px; align-items: center; background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 10px; border: 1px dashed var(--accent-color);">
+                <img src="${upsell.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                <div style="flex:1;">
+                    <div style="font-size: 0.9rem; font-weight: bold;">${upsell.title}</div>
+                    <div style="font-size: 0.85rem; color: var(--accent-color);">${upsell.price}</div>
+                </div>
+                <button class="btn btn-glass" style="padding: 5px 10px; font-size: 0.8rem;" onclick="addToCart(${upsell.id})">Ajouter</button>
+            </div>
+        `;
+    } else {
+        upsellContainer.style.display = 'none';
+    }
 }
 
 // --- INITIALISATION ---
@@ -375,7 +422,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     // Lance les agents frontend
     scheduleNextNotification();
+    updateLiveVisitors();
 });
+
+// --- VISITEURS EN LIGNE (Preuve Sociale Globale) ---
+function updateLiveVisitors() {
+    const counterEl = document.getElementById('liveVisitorsCount');
+    if (!counterEl) return;
+    
+    let baseVisitors = Math.floor(Math.random() * (120 - 45 + 1)) + 45; // Entre 45 et 120
+    counterEl.textContent = baseVisitors;
+
+    setInterval(() => {
+        const change = Math.floor(Math.random() * 5) - 2; // -2 à +2
+        baseVisitors = Math.max(15, baseVisitors + change);
+        counterEl.textContent = baseVisitors;
+        
+        // Petit effet visuel
+        counterEl.style.transform = 'scale(1.3)';
+        counterEl.style.color = 'var(--accent-color)';
+        setTimeout(() => {
+            counterEl.style.transform = 'scale(1)';
+            counterEl.style.color = 'white';
+        }, 300);
+    }, 8000);
+}
 
 // --- AGENT DE PREUVE SOCIALE (SOCIAL PROOF BOT) ---
 const firstNames = ["Lucas", "Emma", "Thomas", "Chloé", "Alexandre", "Camille", "Hugo", "Léa", "Maxime", "Sarah"];
